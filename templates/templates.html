@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="section-head"><h2>광고 스타일 템플릿</h2>
+  <button class="btn" onclick="UI.openModal('tpl-modal')">+ 신규 등록</button></div>
+<div class="grid cards" id="tpl-list"></div>
+
+<div class="modal-backdrop" id="tpl-modal">
+  <div class="modal">
+    <div class="modal-head"><h2>템플릿 등록</h2>
+      <button class="btn ghost sm" onclick="UI.closeModal('tpl-modal')">✕</button></div>
+    <form id="tpl-form">
+      <div class="form-field" id="f-name"><label>템플릿명 *</label>
+        <input name="name"><span class="err-msg">필수 항목입니다</span></div>
+      <div class="form-field"><label>광고 스타일</label><input name="style"></div>
+      <div class="form-field"><label>기본 프롬프트</label><textarea name="base_prompt" rows="2"></textarea></div>
+      <div class="form-field"><label>자막 효과 프롬프트</label><textarea name="subtitle_prompt" rows="2"></textarea></div>
+      <div class="form-field"><label>장면 구성 프롬프트</label><textarea name="scene_prompt" rows="2"></textarea></div>
+      <div class="form-field"><label>나레이션 톤</label><input name="narration_tone"></div>
+      <div class="form-grid">
+        <div class="form-field"><label>추천 영상 길이(초)</label>
+          <select name="rec_length"><option>15</option><option>30</option><option>60</option></select></div>
+        <div class="form-field"><label>추천 AI 모델</label><select name="rec_model" id="tpl-model"></select></div>
+      </div>
+      <div class="form-field"><label>사용 여부</label>
+        <select name="active"><option value="true">사용</option><option value="false">미사용</option></select></div>
+      <button class="btn" type="submit">저장</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/templates.js"></script>{% endblock %}

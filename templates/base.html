@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} | AI 광고 대시보드</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">AI AD STUDIO</div>
+      <nav>
+        {% for p in pages %}
+        <a href="/{{ p.slug }}" class="{{ 'active' if p.slug == active else '' }}">
+          <span>{{ p.icon }}</span><span>{{ p.label }}</span>
+        </a>
+        {% endfor %}
+      </nav>
+    </aside>
+    <div class="main">
+      <header class="header">
+        <div style="display:flex;gap:12px;align-items:center">
+          <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+          <h1>{{ title }}</h1>
+        </div>
+        <div class="profile"><span>👤</span><span>관리자</span></div>
+      </header>
+      <div class="content">{% block content %}{% endblock %}</div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/components.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
