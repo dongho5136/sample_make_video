@@ -1,2 +1,14 @@
 {% extends "base.html" %}
-{% block content %}<h1>{{ title }}</h1>{% endblock %}
+{% block content %}
+<div class="section-head"><h2>생성 결과 관리</h2></div>
+<div class="grid cards" id="results-list"></div>
+
+<div class="modal-backdrop" id="result-modal">
+  <div class="modal" style="width:720px">
+    <div class="modal-head"><h2 id="rm-title"></h2>
+      <button class="btn ghost sm" onclick="UI.closeModal('result-modal')">✕</button></div>
+    <div id="rm-body"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/results.js"></script>{% endblock %}
