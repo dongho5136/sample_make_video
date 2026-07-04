@@ -1,2 +1,7 @@
 {% extends "base.html" %}
-{% block content %}<h1>대시보드</h1>{% endblock %}
+{% block content %}
+<div class="grid stats" id="stats"></div>
+<div class="section-head"><h2>최근 생성 광고</h2></div>
+<div id="recent"></div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/dashboard.js"></script>{% endblock %}
