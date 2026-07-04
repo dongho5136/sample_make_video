@@ -1,2 +1,35 @@
 {% extends "base.html" %}
-{% block content %}<h1>{{ title }}</h1>{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns:1fr 1fr;gap:24px">
+  <form id="gen-form" class="card">
+    <h2 style="margin-bottom:16px">광고 정보 입력</h2>
+    <div class="form-field" id="g-name"><label>광고명 *</label>
+      <input name="name"><span class="err-msg">필수</span></div>
+    <div class="form-grid">
+      <div class="form-field" id="g-product"><label>제품명 *</label>
+        <input name="product"><span class="err-msg">필수</span></div>
+      <div class="form-field"><label>브랜드명</label><input name="brand"></div>
+    </div>
+    <div class="form-field"><label>광고 목적</label><input name="purpose"></div>
+    <div class="form-grid">
+      <div class="form-field"><label>광고 길이</label>
+        <select name="length"><option value="15">15초</option>
+        <option value="30" selected>30초</option><option value="60">60초</option></select></div>
+      <div class="form-field"><label>영상 비율</label><select name="ratio" id="g-ratio"></select></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-field"><label>AI 모델</label><select name="model" id="g-model"></select></div>
+      <div class="form-field" id="g-tpl"><label>스타일 템플릿 *</label>
+        <select name="template" id="g-template"></select><span class="err-msg">필수</span></div>
+    </div>
+    <div class="form-field"><label>캐릭터/제품 에셋</label><select name="asset" id="g-asset"></select></div>
+    <div class="form-field"><label>추가 요청사항</label><textarea name="note" rows="2"></textarea></div>
+    <button class="btn" type="submit">🎬 생성 요청</button>
+  </form>
+  <div class="card">
+    <h2 style="margin-bottom:16px">생성 진행 상태</h2>
+    <div id="gen-progress"><div class="empty">생성 요청 시 구간별 진행 상태가 표시됩니다</div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/generate.js"></script>{% endblock %}
