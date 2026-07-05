@@ -20,6 +20,11 @@ with app.test_client() as c:
         FAIL.append("/api/templates/1 -> not 200")
     if c.get("/api/templates/999999").status_code != 404:
         FAIL.append("/api/templates/<bad> not 404")
+    # 신규: 템플릿 상세 페이지
+    if c.get("/templates/1").status_code != 200:
+        FAIL.append("/templates/1 page -> not 200")
+    if c.get("/templates/999999").status_code != 404:
+        FAIL.append("/templates/<bad> page not 404")
     # 신규: 카테고리/항목 추가 (더미 201)
     if c.post("/api/templates/1/categories", json={"name": "x", "type": "prompt"}).status_code != 201:
         FAIL.append("POST categories not 201")
