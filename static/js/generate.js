@@ -1,6 +1,6 @@
 let scenario = [];
 let templates = [];
-const SEG_COUNT = {15: 2, 30: 4, 60: 6};
+let segmentList = [];   // [{name}]
 
 async function init(){
   const [tpls, meta] = await Promise.all([
@@ -18,14 +18,14 @@ function currentTemplate(){
   return templates.find(t => String(t.id) === id) || null;
 }
 function currentLength(){ return Number(document.getElementById("gen-form").length.value); }
-function segmentNames(length){ return scenario.slice(0, SEG_COUNT[length] || 4); }
+function scenarioName(i){ return scenario[i] || ("구간" + (i + 1)); }
 
 function renderSegments(){
   const t = currentTemplate();
   const box = document.getElementById("g-segments");
   if(!t){ box.innerHTML = `<p class="empty" style="padding:16px">템플릿을 먼저 선택하세요</p>`; return; }
-  const segs = segmentNames(currentLength());
-  box.innerHTML = segs.map((name, si) => {
+  if(!segmentList.length){ box.innerHTML = `<p class="empty" style="padding:16px">구간을 추가하세요</p>`; return; }
+  box.innerHTML = segmentList.map((seg, si) => {
     const cats = t.categories.length ? t.categories.map(c => `
       <div class="form-field" style="margin-bottom:8px">
         <label>${c.name} ${UI.badge(c.type)}</label>
@@ -37,12 +37,26 @@ function renderSegments(){
       : `<p style="color:var(--muted);font-size:12px">선택할 요소가 없습니다</p>`;
     return `<div class="card" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <b style="font-size:14px">${si+1}. ${name}</b>
-        <button type="button" class="btn sm ghost" data-seg-rand="${si}">🎲</button></div>
+        <b style="font-size:14px">${si+1}. ${seg.name}</b>
+        <div style="display:flex;gap:6px">
+          <button type="button" class="btn sm ghost" data-seg-rand="${si}">🎲</button>
+          <button type="button" class="btn sm ghost" data-seg-del="${si}">✕</button></div></div>
       ${cats}</div>`;
   }).join("");
   box.querySelectorAll("button[data-seg-rand]").forEach(b =>
     b.onclick = () => randomizeSegment(b.dataset.segRand));
+  box.querySelectorAll("button[data-seg-del]").forEach(b =>
+    b.onclick = () => removeSegment(Number(b.dataset.segDel)));
+}
+
+function addSegment(){
+  segmentList.push({name: scenarioName(segmentList.length)});
+  renderSegments();
+}
+function removeSegment(i){
+  segmentList.splice(i, 1);
+  segmentList = segmentList.map((_, idx) => ({name: scenarioName(idx)}));
+  renderSegments();
 }
 
 function randomizeSelect(sel){
@@ -58,8 +72,7 @@ function randomizeAll(){
 
 function collectSegments(){
   const t = currentTemplate();
-  const segs = segmentNames(currentLength());
-  return segs.map((name, si) => {
+  return segmentList.map((seg, si) => {
     const selections = {};
     document.querySelectorAll(`#g-segments select[data-seg="${si}"]`).forEach(sel => {
       if(sel.value){
@@ -67,15 +80,16 @@ function collectSegments(){
         selections[cat.name] = sel.value;
       }
     });
-    return {name, selections};
+    return {name: seg.name, selections};
   });
 }
 
 function runAnimation(container, segs){
-  container.innerHTML = segs.map((s,i) =>
+  const rows = segs.length ? segs.map((s,i) =>
     `<div class="progress-row"><span style="width:74px">${i+1}. ${s.name}</span>
      <span class="bar"><i></i></span>
-     <span id="st-${i}" style="width:60px;text-align:right">${UI.badge("대기 중")}</span></div>`).join("")
+     <span id="st-${i}" style="width:60px;text-align:right">${UI.badge("대기 중")}</span></div>`).join("") : "";
+  container.innerHTML = rows
     + `<div class="progress-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
        <span style="width:74px">최종 합본</span><span class="bar"><i id="final-bar"></i></span>
        <span id="final-st" style="width:60px;text-align:right">${UI.badge("대기 중")}</span></div>`;
@@ -102,8 +116,13 @@ function runAnimation(container, segs){
   tick();
 }
 
-document.getElementById("g-template").addEventListener("change", renderSegments);
-document.getElementById("gen-form").length.addEventListener("change", renderSegments);
+document.getElementById("g-template").addEventListener("change", () => {
+  segmentList = currentTemplate() ? [{name: scenarioName(0)}] : [];
+  renderSegments();
+});
+document.getElementById("add-seg").addEventListener("click", () => {
+  if(currentTemplate()) addSegment();
+});
 document.getElementById("rand-all").addEventListener("click", randomizeAll);
 
 document.getElementById("gen-form").addEventListener("submit", async e => {
