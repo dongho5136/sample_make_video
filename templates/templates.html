@@ -2,7 +2,7 @@
 {% block content %}
 <div class="section-head"><h2>광고 스타일 템플릿</h2>
   <button class="btn" onclick="UI.openModal('tpl-modal')">+ 신규 등록</button></div>
-<div class="grid cards" id="tpl-list"></div>
+<div id="tpl-list"></div>
 
 <div class="modal-backdrop" id="tpl-modal">
   <div class="modal">
@@ -22,14 +22,6 @@
         <select name="active"><option value="true">사용</option><option value="false">미사용</option></select></div>
       <button class="btn" type="submit">저장</button>
     </form>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="detail-modal">
-  <div class="modal" style="width:640px">
-    <div class="modal-head"><h2 id="dm-title"></h2>
-      <button class="btn ghost sm" onclick="UI.closeModal('detail-modal')">✕</button></div>
-    <div id="dm-body"></div>
   </div>
 </div>
 {% endblock %}
