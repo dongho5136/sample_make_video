@@ -1,7 +1,7 @@
 const STAT_DEFS = [
   ["total", "전체 생성 광고"], ["completed", "생성 완료"],
   ["generating", "생성 중"], ["failed", "실패"],
-  ["templates", "등록 템플릿"], ["assets", "등록 에셋"]
+  ["templates", "등록 템플릿"], ["pool_items", "총 풀 항목"]
 ];
 async function load(){
   const statsEl = document.getElementById("stats");
