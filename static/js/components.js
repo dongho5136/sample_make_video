@@ -1,7 +1,8 @@
 const STATUS_CLASS = {
   "완료": "ok", "생성 중": "info", "합본 생성 중": "info",
   "구간 생성 완료": "info", "대기 중": "muted", "실패": "err",
-  "사용": "ok", "미사용": "muted"
+  "사용": "ok", "미사용": "muted",
+  "asset": "info", "prompt": "muted"
 };
 window.UI = {
   openModal(id){ document.getElementById(id).classList.add("open"); },
