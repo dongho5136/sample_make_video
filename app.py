@@ -24,6 +24,15 @@ def index():
     return redirect("/dashboard")
 
 
+@app.route("/templates/<int:tid>")
+def template_detail_page(tid):
+    for t in dummy.TEMPLATES:
+        if t["id"] == tid:
+            return render_template("template_detail.html", pages=PAGES,
+                                   active="templates", title=t["name"], template=t)
+    return render_template("404.html", pages=PAGES, active="", title="404"), 404
+
+
 @app.route("/<slug>")
 def page(slug):
     if slug not in _LABELS:
