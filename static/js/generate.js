@@ -36,13 +36,20 @@ function renderSegments(){
       </div>`).join("")
       : `<p style="color:var(--muted);font-size:12px">선택할 요소가 없습니다</p>`;
     return `<div class="card" style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <b style="font-size:14px">${si+1}. ${seg.name}</b>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
+          <b style="font-size:14px">${si+1}.</b>
+          <input data-seg-name="${si}" value="${seg.name}" placeholder="구간 이름"
+            style="flex:1;background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+            padding:7px 10px;border-radius:8px;font-size:14px;font-weight:600">
+        </div>
         <div style="display:flex;gap:6px">
           <button type="button" class="btn sm ghost" data-seg-rand="${si}">🎲</button>
           <button type="button" class="btn sm ghost" data-seg-del="${si}">✕</button></div></div>
       ${cats}</div>`;
   }).join("");
+  box.querySelectorAll("input[data-seg-name]").forEach(inp =>
+    inp.oninput = () => { segmentList[Number(inp.dataset.segName)].name = inp.value; });
   box.querySelectorAll("button[data-seg-rand]").forEach(b =>
     b.onclick = () => randomizeSegment(b.dataset.segRand));
   box.querySelectorAll("button[data-seg-del]").forEach(b =>
@@ -55,7 +62,6 @@ function addSegment(){
 }
 function removeSegment(i){
   segmentList.splice(i, 1);
-  segmentList = segmentList.map((_, idx) => ({name: scenarioName(idx)}));
   renderSegments();
 }
 
