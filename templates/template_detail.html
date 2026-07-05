@@ -1,2 +1,19 @@
 {% extends "base.html" %}
-{% block content %}<h1>{{ template.name }}</h1>{% endblock %}
+{% block content %}
+<a href="/templates" class="btn ghost sm" style="margin-bottom:16px;display:inline-block">← 목록으로</a>
+<div class="card" id="tpl-meta"></div>
+<div class="section-head"><h2>카테고리 & 풀 항목</h2></div>
+<div id="cat-sections"></div>
+<div class="card" style="margin-top:16px">
+  <form id="add-cat-form" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <b style="font-size:13px;margin-right:8px">카테고리 추가</b>
+    <input name="name" placeholder="새 카테고리명" style="flex:1;min-width:140px;background:var(--surface-2);
+      border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:13px">
+    <select name="type" style="background:var(--surface-2);border:1px solid var(--border);
+      color:var(--text);padding:9px;border-radius:8px;font-size:13px">
+      <option value="prompt">prompt</option><option value="asset">asset</option></select>
+    <button class="btn sm" type="submit">+ 추가</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/template_detail.js"></script>{% endblock %}
