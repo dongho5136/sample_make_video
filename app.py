@@ -7,7 +7,6 @@ PAGES = [
     {"slug": "dashboard", "label": "대시보드", "icon": "📊"},
     {"slug": "generate", "label": "광고 생성", "icon": "🎬"},
     {"slug": "templates", "label": "템플릿 관리", "icon": "🧩"},
-    {"slug": "assets", "label": "에셋 관리", "icon": "🖼️"},
     {"slug": "jobs", "label": "생성 작업 목록", "icon": "⏳"},
     {"slug": "results", "label": "생성 결과 관리", "icon": "✅"},
     {"slug": "settings", "label": "설정", "icon": "⚙️"},
@@ -44,11 +43,22 @@ def api_templates():
     return jsonify(dummy.TEMPLATES)
 
 
-@app.route("/api/assets", methods=["GET", "POST"])
-def api_assets():
-    if request.method == "POST":
-        return jsonify({"ok": True, "item": request.get_json()}), 201
-    return jsonify(dummy.ASSETS)
+@app.route("/api/templates/<int:tid>")
+def api_template_detail(tid):
+    for t in dummy.TEMPLATES:
+        if t["id"] == tid:
+            return jsonify(t)
+    return jsonify({"error": "not found"}), 404
+
+
+@app.route("/api/templates/<int:tid>/categories", methods=["POST"])
+def api_add_category(tid):
+    return jsonify({"ok": True, "item": request.get_json()}), 201
+
+
+@app.route("/api/templates/<int:tid>/categories/<int:cid>/items", methods=["POST"])
+def api_add_item(tid, cid):
+    return jsonify({"ok": True, "item": request.get_json()}), 201
 
 
 @app.route("/api/jobs", methods=["GET", "POST"])
