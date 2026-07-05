@@ -20,33 +20,47 @@ function renderCategories(){
           <span style="color:var(--muted);font-size:12px">· 항목 ${c.items.length}</span></div></div>
       <table class="table"><thead><tr><th>항목명</th><th>프롬프트</th>
         ${c.type === "asset" ? "<th>이미지</th>" : ""}</tr></thead><tbody>${
-        c.items.map(it => `<tr><td><b>${it.name}</b></td><td>${it.prompt}</td>
-          ${c.type === "asset" ? `<td>${it.image_url ? "🖼" : "-"}</td>` : ""}</tr>`).join("")
+        c.items.map(it => `<tr><td><b>${it.name}</b></td>
+          <td><div class="prompt-cell" title="${(it.prompt||"").replace(/"/g,"&quot;")}">${it.prompt||""}</div></td>
+          ${c.type === "asset" ? `<td>${it.image_url ? `<img class="thumb-img" src="${it.image_url}">` : "-"}</td>` : ""}</tr>`).join("")
           || `<tr><td colspan="3" style="color:var(--muted)">항목이 없습니다</td></tr>`
       }</tbody></table>
       <form class="add-item-form" data-cid="${c.id}" data-type="${c.type}"
-            style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <input name="name" placeholder="항목명" style="flex:1;min-width:120px;background:var(--surface-2);
           border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;font-size:12px">
         <input name="prompt" placeholder="프롬프트" style="flex:2;min-width:160px;background:var(--surface-2);
           border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;font-size:12px">
-        ${c.type === "asset" ? `<input name="image_url" placeholder="이미지 URL" style="flex:1;min-width:120px;
-          background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px;
-          border-radius:8px;font-size:12px">` : ""}
+        ${c.type === "asset" ? `<input name="image" type="file" accept="image/*" style="flex:1;min-width:120px;
+          color:var(--muted);font-size:12px">` : ""}
         <button class="btn sm" type="submit">+ 항목</button>
       </form>
     </div>`).join("");
+
+  box.querySelectorAll(".prompt-cell").forEach(cell =>
+    cell.onclick = () => cell.classList.toggle("expanded"));
+
   box.querySelectorAll(".add-item-form").forEach(f =>
     f.addEventListener("submit", e => {
       e.preventDefault();
       const name = f.name.value.trim();
       if(!name) return;
       const cat = tpl.categories.find(c => String(c.id) === f.dataset.cid);
-      const img = f.image_url ? f.image_url.value : "";
-      cat.items.push({id: Date.now(), name, prompt: f.prompt.value, image_url: img});
-      try { API.post(`/api/templates/${TID}/categories/${cat.id}/items`,
-        {name, prompt: f.prompt.value, image_url: img}); } catch(_){}
-      renderCategories(); UI.toast("항목이 추가되었습니다");
+      const fileInput = f.image;
+      const addItem = (img) => {
+        cat.items.push({id: Date.now(), name, prompt: f.prompt.value, image_url: img || ""});
+        try { API.post(`/api/templates/${TID}/categories/${cat.id}/items`,
+          {name, prompt: f.prompt.value, image_url: img || ""}); } catch(_){}
+        renderCategories(); UI.toast("항목이 추가되었습니다");
+      };
+      if(fileInput && fileInput.files && fileInput.files[0]){
+        const reader = new FileReader();
+        reader.onload = () => addItem(reader.result);
+        reader.onerror = () => addItem("");
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        addItem("");
+      }
     }));
 }
 
