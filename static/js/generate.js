@@ -17,53 +17,63 @@ function currentTemplate(){
   const id = document.getElementById("g-template").value;
   return templates.find(t => String(t.id) === id) || null;
 }
+function currentLength(){ return Number(document.getElementById("gen-form").length.value); }
+function segmentNames(length){ return scenario.slice(0, SEG_COUNT[length] || 4); }
 
-function renderCategories(){
+function renderSegments(){
   const t = currentTemplate();
-  const box = document.getElementById("g-categories");
+  const box = document.getElementById("g-segments");
   if(!t){ box.innerHTML = `<p class="empty" style="padding:16px">템플릿을 먼저 선택하세요</p>`; return; }
-  if(!t.categories.length){ box.innerHTML = `<p class="empty" style="padding:16px">이 템플릿에는 카테고리가 없습니다</p>`; return; }
-  box.innerHTML = t.categories.map(c => `
-    <div class="form-field" style="margin-bottom:10px">
-      <label>${c.name} ${UI.badge(c.type)}</label>
-      <div style="display:flex;gap:8px">
-        <select data-cat="${c.id}" style="flex:1;background:var(--surface-2);border:1px solid var(--border);
-          color:var(--text);padding:10px;border-radius:8px;font-size:13px">
+  const segs = segmentNames(currentLength());
+  box.innerHTML = segs.map((name, si) => {
+    const cats = t.categories.length ? t.categories.map(c => `
+      <div class="form-field" style="margin-bottom:8px">
+        <label>${c.name} ${UI.badge(c.type)}</label>
+        <select data-seg="${si}" data-cat="${c.id}" style="width:100%;background:var(--surface-2);
+          border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:13px">
           <option value="">선택 안 함</option>
           ${c.items.map(it=>`<option>${it.name}</option>`).join("")}</select>
-        <button type="button" class="btn sm ghost" data-rand="${c.id}">🎲</button>
-      </div>
-    </div>`).join("");
-  box.querySelectorAll("button[data-rand]").forEach(b =>
-    b.onclick = () => randomizeOne(b.dataset.rand));
+      </div>`).join("")
+      : `<p style="color:var(--muted);font-size:12px">선택할 요소가 없습니다</p>`;
+    return `<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <b style="font-size:14px">${si+1}. ${name}</b>
+        <button type="button" class="btn sm ghost" data-seg-rand="${si}">🎲</button></div>
+      ${cats}</div>`;
+  }).join("");
+  box.querySelectorAll("button[data-seg-rand]").forEach(b =>
+    b.onclick = () => randomizeSegment(b.dataset.segRand));
 }
 
-function randomizeOne(cid){
-  const sel = document.querySelector(`#g-categories select[data-cat="${cid}"]`);
+function randomizeSelect(sel){
   const opts = [...sel.options].filter(o => o.value !== "");
   if(opts.length) sel.value = opts[Math.floor(Math.random()*opts.length)].text;
 }
-function randomizeAll(){
-  document.querySelectorAll("#g-categories select[data-cat]").forEach(sel =>
-    randomizeOne(sel.dataset.cat));
+function randomizeSegment(si){
+  document.querySelectorAll(`#g-segments select[data-seg="${si}"]`).forEach(randomizeSelect);
 }
-function collectSelections(){
-  const t = currentTemplate();
-  const out = {};
-  document.querySelectorAll("#g-categories select[data-cat]").forEach(sel => {
-    if(sel.value){
-      const cat = t.categories.find(c => String(c.id) === sel.dataset.cat);
-      out[cat.name] = sel.value;
-    }
-  });
-  return out;
+function randomizeAll(){
+  document.querySelectorAll("#g-segments select[data-seg]").forEach(randomizeSelect);
 }
 
-function segmentsFor(length){ return scenario.slice(0, SEG_COUNT[length] || 4); }
+function collectSegments(){
+  const t = currentTemplate();
+  const segs = segmentNames(currentLength());
+  return segs.map((name, si) => {
+    const selections = {};
+    document.querySelectorAll(`#g-segments select[data-seg="${si}"]`).forEach(sel => {
+      if(sel.value){
+        const cat = t.categories.find(c => String(c.id) === sel.dataset.cat);
+        selections[cat.name] = sel.value;
+      }
+    });
+    return {name, selections};
+  });
+}
 
 function runAnimation(container, segs){
   container.innerHTML = segs.map((s,i) =>
-    `<div class="progress-row"><span style="width:74px">${i+1}. ${s}</span>
+    `<div class="progress-row"><span style="width:74px">${i+1}. ${s.name}</span>
      <span class="bar"><i></i></span>
      <span id="st-${i}" style="width:60px;text-align:right">${UI.badge("대기 중")}</span></div>`).join("")
     + `<div class="progress-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
@@ -92,7 +102,8 @@ function runAnimation(container, segs){
   tick();
 }
 
-document.getElementById("g-template").addEventListener("change", renderCategories);
+document.getElementById("g-template").addEventListener("change", renderSegments);
+document.getElementById("gen-form").length.addEventListener("change", renderSegments);
 document.getElementById("rand-all").addEventListener("click", randomizeAll);
 
 document.getElementById("gen-form").addEventListener("submit", async e => {
@@ -106,13 +117,12 @@ document.getElementById("gen-form").addEventListener("submit", async e => {
       else el.classList.remove("error");
     });
   if(!ok) return;
-  const length = Number(f.length.value);
-  const segs = segmentsFor(length);
   const t = currentTemplate();
+  const segments = collectSegments();
   try {
     await API.post("/api/jobs", {name: f.name.value, template: t ? t.name : "",
-      model: f.model.value, length, status: "생성 중", selections: collectSelections()});
+      model: f.model.value, length: currentLength(), status: "생성 중", segments});
   } catch(_){}
-  runAnimation(document.getElementById("gen-progress"), segs);
+  runAnimation(document.getElementById("gen-progress"), segments);
 });
 init();
