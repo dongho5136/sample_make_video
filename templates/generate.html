@@ -22,7 +22,10 @@
       <div class="form-field" id="g-tpl"><label>스타일 템플릿 *</label>
         <select name="template" id="g-template"></select><span class="err-msg">필수</span></div>
     </div>
-    <div class="form-field"><label>캐릭터/제품 에셋</label><select name="asset" id="g-asset"></select></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 4px">
+      <label style="color:var(--muted);font-size:12px">카테고리 선택</label>
+      <button type="button" class="btn sm ghost" id="rand-all">🎲 전체 랜덤</button></div>
+    <div id="g-categories"><p class="empty" style="padding:16px">템플릿을 먼저 선택하세요</p></div>
     <div class="form-field"><label>추가 요청사항</label><textarea name="note" rows="2"></textarea></div>
     <button class="btn" type="submit">🎬 생성 요청</button>
   </form>
